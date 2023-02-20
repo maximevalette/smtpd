@@ -331,7 +331,7 @@ class Client
 
             return $this->dataSend($response);
         } elseif ($commandCmp == 'mail') {
-            if ($this->getStatus('hasHello')) {
+            if ($this->getStatus('hasAuthSuccess')) {
                 if (isset($args[0]) && $args[0]) {
                     $this->setStatus('hasMail', true);
                     $from = $args[0];
@@ -347,7 +347,7 @@ class Client
             }
             return $this->sendSyntaxErrorCommandUnrecognized();
         } elseif ($commandCmp == 'rcpt') {
-            if ($this->getStatus('hasHello')) {
+            if ($this->getStatus('hasAuthSuccess')) {
                 if (isset($args[0]) && $args[0]) {
                     $this->setStatus('hasMail', true);
                     $rcpt = $args[0];
@@ -367,7 +367,7 @@ class Client
             }
             return $this->sendSyntaxErrorCommandUnrecognized();
         } elseif ($commandCmp == 'data') {
-            if ($this->getStatus('hasHello')) {
+            if ($this->getStatus('hasAuthSuccess')) {
                 $this->setStatus('hasData', true);
 
                 return $this->sendDataResponse();
@@ -430,7 +430,7 @@ class Client
         } elseif ($commandCmp == 'help') {
             return $this->sendOk('HELO, EHLO, MAIL FROM, RCPT TO, DATA, NOOP, QUIT');
         } else {
-            if ($this->getStatus('hasAuth')) {
+            if ($this->getStatus('hasAuthSuccess') && !$this->getStatus('hasData')) {
                 if ($this->getStatus('hasAuthPlain')) {
                     $this->setStatus('hasAuthPlainUser', true);
                     $this->setCredentials([$command]);
@@ -529,6 +529,8 @@ class Client
         if (!$attempt) {
             return false;
         }
+
+        $this->setStatus('hasAuthSuccess', true);
 
         return true;
     }
